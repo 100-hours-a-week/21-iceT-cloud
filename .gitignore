@@ -45,5 +45,5 @@ terraform.rc
 Terraform_Project/backend/.terraform/
 environments/dev/.terraform/
 
-Terraform_Project/backend/terraform.tfstate*
-Terraform_Project/environments/dev/terraform.tfstate*
+Terraform_Project/backend/.terraform/terraform.tfstate*
+Terraform_Project/environments/dev/.terraform//terraform.tfstate*
