@@ -9,13 +9,13 @@ terraform {
   }
 
   # (옵션) 백엔드 설정: 원격 상태 저장소를 사용하는 경우 설정
-#   backend "s3" {
-#     bucket = "evan-terraformstate"
-#     key  = "./terraform.tfstate"
-#     region = "ap-northeast-2"
-#     encrypt = true
-#     dynamodb_table = "evan-terraformstate"
-#   }
+  backend "s3" {
+    bucket = "evan-terraformstate"
+    key  = "./terraform.tfstate"
+    region = "ap-northeast-2"
+    encrypt = true
+    dynamodb_table = "evan-terraformstate"
+  }
 }
 
 provider "aws" {
