@@ -47,3 +47,4 @@ environments/dev/.terraform/
 
 Terraform_Project/backend/.terraform/terraform.tfstate*
 Terraform_Project/environments/dev/.terraform//terraform.tfstate*
+Terraform_Project/environments/dev/terraform.tfvars*
