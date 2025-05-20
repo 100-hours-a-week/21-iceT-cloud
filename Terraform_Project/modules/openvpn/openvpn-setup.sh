@@ -8,7 +8,7 @@ sleep 90  # Increased wait time to ensure full initialization
 
 # Set admin password
 echo "Setting admin password..."
-ADMIN_PASSWORD="-" # Change this to your desired password
+ADMIN_PASSWORD="koco" # Change this to your desired password
 # Use the correct method to set the OpenVPN admin password
 sudo /usr/local/openvpn_as/scripts/sacli --user openvpn --new_pass "$ADMIN_PASSWORD" SetLocalPassword
 

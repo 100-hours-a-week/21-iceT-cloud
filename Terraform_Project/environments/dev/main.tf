@@ -30,6 +30,14 @@ module "openvpn" {
   vpc_security_group_ids  = [module.security_groups.sg_openvpn.id]
 }
 
+module "alb" {
+  source = "../../modules/alb"
+  security_group_ids = [module.security_groups.sg_alb.id]
+  subnet_ids = module.network.private_app_subnet_ids
+  vpc_id = module.network.vpc_id
+  certificate_arn = var.certificate_arn
+}
+
 # module "asg" {
 #   source = "../modules/asg"
 
