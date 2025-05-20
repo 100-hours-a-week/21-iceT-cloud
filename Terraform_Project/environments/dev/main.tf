@@ -19,6 +19,17 @@ module "network" {
   ]
 }
 
+module "security_groups" {
+  source = "../../modules/security_groups"
+  vpc_id = module.network.vpc_id
+}
+
+module "openvpn" {
+  source = "../../modules/openvpn"
+  subnet_id               = module.network.public_subnet_ids[0]
+  vpc_security_group_ids  = [module.security_groups.sg_openvpn.id]
+}
+
 # module "asg" {
 #   source = "../modules/asg"
 
