@@ -8,7 +8,7 @@ sleep 90  # Increased wait time to ensure full initialization
 
 # Set admin password
 echo "Setting admin password..."
-ADMIN_PASSWORD="koco" # Change this to your desired password
+ADMIN_PASSWORD="-" # Change this to your desired password
 # Use the correct method to set the OpenVPN admin password
 sudo /usr/local/openvpn_as/scripts/sacli --user openvpn --new_pass "$ADMIN_PASSWORD" SetLocalPassword
 
@@ -48,13 +48,13 @@ sudo /usr/local/openvpn_as/scripts/sacli --key "vpn.client.routing.reroute_gw" -
 echo "Creating client profile..."
 sudo /usr/local/openvpn_as/scripts/sacli --user client1 --key "prop_autologin" --value "true" UserPropPut
 sudo /usr/local/openvpn_as/scripts/sacli --user client1 --key "prop_superuser" --value "false" UserPropPut
-sudo /usr/local/openvpn_as/scripts/sacli --user client1 --new_pass "ClientPassword123" SetLocalPassword
+sudo /usr/local/openvpn_as/scripts/sacli --user client1 --new_pass "-" SetLocalPassword
 
 # Create an admin user profile
 echo "Creating admin profile..."
 sudo /usr/local/openvpn_as/scripts/sacli --user admin --key "prop_autologin" --value "true" UserPropPut
 sudo /usr/local/openvpn_as/scripts/sacli --user admin --key "prop_superuser" --value "true" UserPropPut
-sudo /usr/local/openvpn_as/scripts/sacli --user admin --new_pass "AdminPassword123" SetLocalPassword
+sudo /usr/local/openvpn_as/scripts/sacli --user admin --new_pass "-" SetLocalPassword
 
 # Apply changes and restart services
 echo "Applying changes and restarting services..."
