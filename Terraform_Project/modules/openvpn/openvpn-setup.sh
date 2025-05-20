@@ -48,13 +48,13 @@ sudo /usr/local/openvpn_as/scripts/sacli --key "vpn.client.routing.reroute_gw" -
 echo "Creating client profile..."
 sudo /usr/local/openvpn_as/scripts/sacli --user client1 --key "prop_autologin" --value "true" UserPropPut
 sudo /usr/local/openvpn_as/scripts/sacli --user client1 --key "prop_superuser" --value "false" UserPropPut
-sudo /usr/local/openvpn_as/scripts/sacli --user client1 --new_pass "-" SetLocalPassword
+sudo /usr/local/openvpn_as/scripts/sacli --user client1 --new_pass "ClientPassword123" SetLocalPassword
 
 # Create an admin user profile
 echo "Creating admin profile..."
 sudo /usr/local/openvpn_as/scripts/sacli --user admin --key "prop_autologin" --value "true" UserPropPut
 sudo /usr/local/openvpn_as/scripts/sacli --user admin --key "prop_superuser" --value "true" UserPropPut
-sudo /usr/local/openvpn_as/scripts/sacli --user admin --new_pass "-" SetLocalPassword
+sudo /usr/local/openvpn_as/scripts/sacli --user admin --new_pass "AdminPassword123" SetLocalPassword
 
 # Apply changes and restart services
 echo "Applying changes and restarting services..."

@@ -60,5 +60,3 @@ module "alb" {
 #     module.ec2       // ec2 모듈이 완료된 후 실행
 #   ]
 # }
-
-
