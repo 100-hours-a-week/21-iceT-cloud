@@ -35,7 +35,17 @@ module "alb" {
   security_group_ids = [module.security_groups.sg_alb.id]
   subnet_ids = module.network.private_app_subnet_ids
   vpc_id = module.network.vpc_id
-  certificate_arn = var.certificate_arn
+}
+
+module "s3_static_site" {
+  source              = "../../modules/s3_static_site"
+  cloudfront_oai_arn  = module.cdn.cloudfront_oai_arn
+}
+
+module "cdn" {
+  source         = "../../modules/cdn"
+  s3_bucket_name = module.s3_static_site.s3_bucket_name
+  alb_dns_name = module.alb.alb_dns_name
 }
 
 # module "asg" {

@@ -1,3 +1,8 @@
+variable "domain_name" {
+  type = string
+  default = "koco.click"
+}
+
 variable "alb_name" {
   description = "ALB 이름"
   type        = string
@@ -67,11 +72,6 @@ variable "listener_protocol" {
   default     = "HTTP"
 }
 
-variable "certificate_arn" { # 값 넣어 주어야 함
-  description = "Certificate ARN for HTTPS"
-  type        = string
-}
-
 variable "listener_http_name" {
   description = "ALB http 리스너 이름"
   type        = string
@@ -82,4 +82,9 @@ variable "listener_https_name" {
   description = "ALB https 리스너 이름"
   type        = string
   default     = "koco-app-listener-https"
+}
+
+variable "acm_certificate_arn" {
+  type = string
+  default = "arn:aws:acm:ap-northeast-2:266735804784:certificate/6d22a276-2cab-4879-bb1f-10f7ee88621d"
 }
