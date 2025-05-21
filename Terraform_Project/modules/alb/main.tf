@@ -1,3 +1,9 @@
+# ALB용 ACM 인증서 발급 및 검증 (서울 리전)
+data "aws_route53_zone" "main" {
+  name         = var.domain_name 
+  private_zone = false
+}
+
 # ALB 생성
 resource "aws_lb" "this" {
   name               = var.alb_name
@@ -7,7 +13,31 @@ resource "aws_lb" "this" {
   subnets            = var.subnet_ids
 
   tags = {
-    Name        = var.alb_name
+    Name = var.alb_name
+  }
+}
+
+resource "aws_route53_record" "alb_root" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "api.${var.domain_name}"                 # "api.ktbkoco.com"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.this.dns_name
+    zone_id                = aws_lb.this.zone_id
+    evaluate_target_health = true
+  }
+}
+
+resource "aws_route53_record" "alb_www" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "www.api.${var.domain_name}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.this.dns_name
+    zone_id                = aws_lb.this.zone_id
+    evaluate_target_health = true
   }
 }
 
@@ -26,8 +56,9 @@ resource "aws_lb_target_group" "blue" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
+
   tags = {
-    Name   = "${var.target_group_name}-blue-tg"
+    Name = "${var.target_group_name}-blue-tg"
   }
 }
 
@@ -45,8 +76,9 @@ resource "aws_lb_target_group" "green" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
+
   tags = {
-    Name   = "${var.target_group_name}-green-tg"
+    Name = "${var.target_group_name}-green-tg"
   }
 }
 
@@ -65,6 +97,7 @@ resource "aws_lb_listener" "http" {
       status_code = "HTTP_301"
     }
   }
+
   tags = {
     Name = var.listener_http_name
   }
@@ -76,7 +109,7 @@ resource "aws_lb_listener" "https" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.certificate_arn
+  certificate_arn   = var.acm_certificate_arn
 
   default_action {
     type             = "forward"

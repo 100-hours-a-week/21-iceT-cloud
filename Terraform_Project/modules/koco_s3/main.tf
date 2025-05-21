@@ -33,3 +33,18 @@ resource "aws_s3_bucket_policy" "image" {
     ]
   })
 }
+
+resource "aws_s3_bucket_cors_configuration" "image" {
+  bucket = aws_s3_bucket.image.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT"]
+    allowed_origins = [
+      "http://localhost:5173",
+      "https://ktbkoco.com"
+    ]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
