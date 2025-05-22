@@ -4,7 +4,9 @@ data "aws_route53_zone" "main" {
   private_zone = false
 }
 
-# ALB 생성
+####################################
+# 1. ALB 생성 (인터넷-facing)
+####################################
 resource "aws_lb" "this" {
   name               = var.alb_name
   internal           = false
@@ -13,9 +15,14 @@ resource "aws_lb" "this" {
   subnets            = var.subnet_ids
 
   tags = {
-    Name = var.alb_name
+    Environment = var.environment
+    Name        = var.alb_name
   }
 }
+
+####################################
+# 1.1 route53 레코드 생성 
+####################################
 
 resource "aws_route53_record" "alb_root" {
   zone_id = data.aws_route53_zone.main.zone_id
@@ -41,49 +48,49 @@ resource "aws_route53_record" "alb_www" {
   }
 }
 
-# ALB 대상 그룹 생성 (HTTP 포트 80)
+
+####################################
+# 2. Target Groups (Blue & Green)
+####################################
 resource "aws_lb_target_group" "blue" {
-  name     = "${var.target_group_name}-blue-tg"
-  port     = var.target_group_port
-  protocol = var.target_group_protocol
-  vpc_id   = var.vpc_id
+  name        = "tg-blue"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "instance"
 
   health_check {
     path                = "/health"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 30
+    interval            = 15
+    timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-  }
-
-  tags = {
-    Name = "${var.target_group_name}-blue-tg"
+    matcher             = "200"
   }
 }
 
 resource "aws_lb_target_group" "green" {
-  name     = "${var.target_group_name}-green-tg"
-  port     = var.target_group_port
-  protocol = var.target_group_protocol
-  vpc_id   = var.vpc_id
+  name        = "tg-green"
+  port        = 8080
+  protocol    = "HTTP"
+  vpc_id      = var.vpc_id
+  target_type = "instance"
 
   health_check {
     path                = "/health"
-    protocol            = "HTTP"
-    matcher             = "200"
-    interval            = 30
+    interval            = 15
+    timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
-  }
-
-  tags = {
-    Name = "${var.target_group_name}-green-tg"
+    matcher             = "200"
   }
 }
 
-# ALB Listener 생성
-# 1. HTTP → HTTPS 리디렉션
+####################################
+# 3. ALB Listener (http:포트 80)
+#    - 기본은 tg-blue
+#    - tg-green은 추가 리스너 룰로 연결
+####################################
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.this.arn
   port              = 80
@@ -97,13 +104,13 @@ resource "aws_lb_listener" "http" {
       status_code = "HTTP_301"
     }
   }
-
-  tags = {
-    Name = var.listener_http_name
-  }
 }
 
-# 2. HTTPS 리스너 → 대상 그룹으로 요청 전달
+####################################
+# 3.1 ALB Listener (https:포트 443)
+#    - 기본은 tg-blue
+#    - tg-green은 추가 리스너 룰로 연결
+####################################
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
@@ -115,8 +122,24 @@ resource "aws_lb_listener" "https" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.blue.arn  # 기본은 Blue로
   }
+}
 
-  tags = {
-    Name = var.listener_https_name
+####################################
+# 4. tg-green용 리스너 룰
+#    - CodeDeploy가 tg-green을 인식할 수 있도록 연결
+####################################
+resource "aws_lb_listener_rule" "green_rule" {
+  listener_arn = aws_lb_listener.https.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.green.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/green-health-check"]
+    }
   }
 }
