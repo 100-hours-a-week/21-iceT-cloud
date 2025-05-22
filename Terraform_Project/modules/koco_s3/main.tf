@@ -48,7 +48,8 @@ resource "aws_s3_bucket_cors_configuration" "image" {
     allowed_methods = ["PUT"]
     allowed_origins = [
       "http://localhost:5173",
-      "https://ktbkoco.com"
+      "https://ktbkoco.com",
+      "https://koco-admin.o-r.kr"
     ]
     expose_headers  = ["ETag"]
     max_age_seconds = 3000
