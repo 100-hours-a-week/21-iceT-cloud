@@ -3,10 +3,15 @@ variable "domain_name" {
   default = "koco.click"
 }
 
+variable "environment" {
+  description = "환경 이름 (예: dev, stage, prod)"
+  type        = string
+}
+
 variable "alb_name" {
   description = "ALB 이름"
   type        = string
-  default     = "koco-app-alb"
+  default     = "app-alb"
 }
 
 variable "subnet_ids" {
@@ -27,7 +32,7 @@ variable "vpc_id" {
 variable "target_group_name" {
   description = "ALB 대상 그룹 이름"
   type        = string
-  default     = "koco-app"
+  default     = "app-tg"
 }
 
 variable "target_group_port" {
@@ -45,7 +50,7 @@ variable "target_group_protocol" {
 variable "health_check_path" {
   description = "헬스 체크 경로"
   type        = string
-  default     = "/health"
+  default     = "/"
 }
 
 variable "health_check_protocol" {
@@ -72,19 +77,7 @@ variable "listener_protocol" {
   default     = "HTTP"
 }
 
-variable "listener_http_name" {
-  description = "ALB http 리스너 이름"
-  type        = string
-  default     = "koco-app-listener-http"
-}
-
-variable "listener_https_name" {
-  description = "ALB https 리스너 이름"
-  type        = string
-  default     = "koco-app-listener-https"
-}
-
 variable "acm_certificate_arn" {
   type = string
-  default = "arn:aws:acm:ap-northeast-2:266735804784:certificate/6d22a276-2cab-4879-bb1f-10f7ee88621d"
+  default = "arn:aws:acm:ap-northeast-2:266735804784:certificate/c29976ee-8091-402e-b321-486a0884b60a"
 }
