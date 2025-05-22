@@ -1,3 +1,9 @@
+####################################
+# 테라폼 상태저장을 aws s3와 DynamoDB로 관리하기 위한 설정 테라폼 실행 파일
+  # 이 파일을 통해 테라폼 상태를 관리하는 s3와 DynamoDB가 생성된다.
+  # 이 파일을 terraform apply 한 후 dev/main or prod/main 을 terraform apply 해야한다.
+####################################
+
 resource "aws_s3_bucket" "terraform_state" { 
   bucket = "evan-terraformstate"
   force_destroy = false
