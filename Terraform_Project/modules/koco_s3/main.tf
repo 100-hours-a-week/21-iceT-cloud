@@ -1,3 +1,9 @@
+####################################
+# 이미지 저장 버킷 생성 코드로 dev/main.tf의 모듈이 실행되지 않고, 
+# 21-iceT-cloud/Terraform_Project/environments/s3 폴더에서 개별적으로 실행된다
+# 즉 dev/main.tf을 terraform destroy해도 삭제되지 않음
+####################################
+
 resource "aws_s3_bucket" "image" {
   bucket = var.bucket_name
   force_destroy = false     # 버킷 비우기 없이 삭제 방지
