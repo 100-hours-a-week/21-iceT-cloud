@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev      # 또는 원하는 브랜치
-      - main
   workflow_dispatch:  # 수동 실행도 가능
 
 jobs:
