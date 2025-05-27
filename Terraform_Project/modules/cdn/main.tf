@@ -109,6 +109,9 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
+  # cloudFront WAF 연결
+  web_acl_id = "arn:aws:wafv2:us-east-1:266735804784:global/webacl/secure-waf/75fa0fac-0e8e-4e42-9b10-6297b45891c1"
+
   tags = {
     Name = "frontend-distribution"
   }
