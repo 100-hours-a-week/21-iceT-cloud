@@ -1,0 +1,80 @@
+on:
+  push:
+    branches:
+      - dev    
+      - main
+  workflow_dispatch:  # 수동 실행도 가능
+
+jobs:
+  build-deploy-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '20.19.1'
+
+      - name: Install dependencies
+        working-directory: ./koco
+        run: npm ci
+
+      - name: Generate .env file for Vite (based on branch)
+        working-directory: ./koco
+        run: |
+          echo "[FRONTEND] Generating .env file for branch: ${{ github.ref_name }}"
+          
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "VITE_IS_QA=prod" >> .env
+            echo "VITE_API_BASE_URL=https://ktbkoco.com/" >> .env
+            echo "VITE_REDIRECT_URL=https://ktbkoco.com/oauth/kakao/callback" >> .env
+            echo "VITE_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
+          else
+            echo "VITE_IS_QA=dev" >> .env
+            echo "VITE_API_BASE_URL=https://koco.click/" >> .env
+            echo "VITE_REDIRECT_URL=https://koco.click/oauth/kakao/callback" >> .env
+            echo "VITE_KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> .env
+          fi
+
+      - name: Build React App
+        working-directory: ./koco
+        run: npm run build
+
+      - name: Deploy to Static Hosting S3 (koco-front-s3)
+        run: |
+          aws s3 sync ./koco/dist s3://koco-front-s3 --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "ap-northeast-2"
+
+      - name: Archive build to versioned S3 bucket (koco-frontend-builds)
+        run: |
+          TIMESTAMP=$(TZ=Asia/Seoul date +%Y%m%d-%H%M%S) 
+          aws s3 sync ./koco/dist s3://koco-frontend-builds/$TIMESTAMP/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: "ap-northeast-2"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            DOMAIN="ktbkoco.com"
+          else
+            DOMAIN="koco.click"
+          fi
+        
+          DIST_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[?contains(@, '$DOMAIN')]].Id" \
+            --output text)
+        
+          echo "Invalidating CloudFront cache for distribution ID: $DIST_ID (domain: $DOMAIN)"
+          aws cloudfront create-invalidation --distribution-id "$DIST_ID" --paths "/*"
+        env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            AWS_REGION: "ap-northeast-2"

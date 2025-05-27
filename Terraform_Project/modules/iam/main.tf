@@ -117,7 +117,6 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm_parameter_read_attach" {
   policy_arn = aws_iam_policy.ssm_parameter_read.arn
 }
 
-
 ########################################
 # EC2 인스턴스 프로파일 생성
 ########################################
