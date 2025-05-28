@@ -82,6 +82,7 @@ module "ec2" {
   # user_data는 기본값을 사용하거나 별도로 수정 가능
 }
 
+
 module "asg" {
   source = "../../modules/asg"
 
@@ -121,4 +122,10 @@ module "openvpn" {
   source = "../../modules/openvpn"
   subnet_id               = module.network.public_subnet_ids[0]
   vpc_security_group_ids  = [module.security_groups.openvpn_sg_id]
+}
+
+module "monitoring-ec2" {
+  source = "../../modules/monitoring-ec2"
+  vpc_id = module.network.vpc_id
+  private_subnet_id = module.network.private_app_subnet_ids[0]
 }
