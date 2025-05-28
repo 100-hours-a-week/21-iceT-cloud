@@ -14,6 +14,12 @@ resource "aws_lb" "this" {
   security_groups    = var.security_group_ids
   subnets            = var.subnet_ids
 
+  access_logs {
+    bucket  = var.alb_logs_bucket_name
+    prefix  = "alb-logs/${var.environment}"
+    enabled = true
+  }
+
   tags = {
     Environment = var.environment
     Name        = var.alb_name
