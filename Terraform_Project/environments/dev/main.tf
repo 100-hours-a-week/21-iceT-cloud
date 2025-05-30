@@ -66,6 +66,7 @@ module "codedeploy" {
   autoscaling_groups    = [module.asg.asg_name]
 
   depends_on = [
+    module.network,
     module.iam,  // iam 모듈이 완료된 후 실행
     module.alb,      // alb 모듈이 완료된 후 실행
     module.asg       // asg 모듈이 완료된 후 실행
@@ -80,6 +81,10 @@ module "ec2" {
   iam_instance_profile_name  = module.iam.ec2_instance_profile_name
   security_group_ids         = [module.security_groups.app_sg_id]
   # user_data는 기본값을 사용하거나 별도로 수정 가능
+
+  depends_on = [
+    module.network  // network 모듈이 완료된 후 실행
+  ]
 }
 
 
@@ -94,7 +99,6 @@ module "asg" {
   desired_capacity      = 1
   min_size              = 1
   max_size              = 1
-  target_group_arns     = module.alb.target_group_blue_arn
   health_check_type         = "EC2"
   health_check_grace_period = 300
   instance_tag_name     = "app-instance"
@@ -115,6 +119,10 @@ module "alb" {
   security_group_ids  = [module.security_groups.alb_sg_id]                   # ALB 전용 보안 그룹
   vpc_id              = module.network.vpc_id                                 # 네트워크 모듈의 VPC ID 사용
   # 나머지 변수들은 기본값 사용 (필요시 tfvars 또는 직접 값 지정)
+  
+  depends_on = [
+    module.network  // network 모듈이 완료된 후 실행
+  ]
 }
 
 
@@ -122,10 +130,30 @@ module "openvpn" {
   source = "../../modules/openvpn"
   subnet_id               = module.network.public_subnet_ids[0]
   vpc_security_group_ids  = [module.security_groups.openvpn_sg_id]
+
+  depends_on = [
+    module.network  // network 모듈이 완료된 후 실행
+
+    
+  ]
 }
 
 module "monitoring-ec2" {
   source = "../../modules/monitoring-ec2"
   vpc_id = module.network.vpc_id
   private_subnet_id = module.network.private_app_subnet_ids[0]
+
+  depends_on = [
+    module.network  // network 모듈이 완료된 후 실행
+  ]
+}
+
+module "database-ec2" {
+  source = "../../modules/database-ec2"
+  subnet_private_id = module.network.private_db_subnet_ids[0]
+  security_group_db_sg_id = module.security_groups.db_sg_id
+
+  depends_on = [
+    module.network  // network 모듈이 완료된 후 실행
+  ]
 }
