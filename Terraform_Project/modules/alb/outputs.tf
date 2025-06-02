@@ -28,7 +28,12 @@ output "target_group_green_name" {
   value       = aws_lb_target_group.green.name
 }
 
-output "listener_arn" {
+output "alb_listener_https_arn" {
   description = "생성된 ALB 리스너의 ARN"
   value       = aws_lb_listener.https.arn
+}
+
+output "alb_listener_test_https_arn" {
+  description = "생성된 ALB 리스너의 ARN"
+  value       = aws_lb_listener.test_https.arn
 }

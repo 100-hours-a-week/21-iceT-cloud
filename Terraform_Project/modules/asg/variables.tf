@@ -39,15 +39,15 @@ variable "max_size" {
   type        = number
 }
 
-# variable "target_group_arns" {
-#   type = list(string)
-#   description = "List of target group ARNs for the Auto Scaling Group"
-# }
+variable "lb_target_group_blue_arn" {
+  type = string
+  description = "List of target group ARNs for the Auto Scaling Group"
+}
 
 variable "health_check_type" {
   description = "헬스체크 타입 (예: EC2, ELB)"
   type        = string
-  default     = "EC2"
+  default     = "ELB"
 }
 
 variable "health_check_grace_period" {
