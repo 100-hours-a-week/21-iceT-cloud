@@ -98,6 +98,8 @@ resource "aws_iam_policy" "ssm_parameter_read" {
       {
         Effect = "Allow",
         Action = [
+          "ssm:GetParameters",
+          "ssm:GetParameter",
           "ssm:GetParametersByPath"
         ],
         Resource = "arn:aws:ssm:ap-northeast-2:266735804784:parameter/spring/*"

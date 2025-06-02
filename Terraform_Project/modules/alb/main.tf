@@ -61,7 +61,7 @@ resource "aws_lb_target_group" "blue" {
 
   health_check {
     path                = "/actuator/health"
-    interval            = 15
+    interval            = 30
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -78,7 +78,7 @@ resource "aws_lb_target_group" "green" {
 
   health_check {
     path                = "/actuator/health"
-    interval            = 15
+    interval            = 30
     timeout             = 5
     healthy_threshold   = 2
     unhealthy_threshold = 2
@@ -106,11 +106,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-####################################
-# 3.1 ALB Listener (https:포트 443)
-#    - 기본은 tg-blue
-#    - tg-green은 추가 리스너 룰로 연결
-####################################
+# 4.5. ALB Listener: HTTPS(443) → 기본적으로 Blue TG로 포워드
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.this.arn
   port              = 443
@@ -120,26 +116,20 @@ resource "aws_lb_listener" "https" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.blue.arn  # 기본은 Blue로
+    target_group_arn = aws_lb_target_group.blue.arn
   }
 }
 
-####################################
-# 4. tg-green용 리스너 룰
-#    - CodeDeploy가 tg-green을 인식할 수 있도록 연결
-####################################
-resource "aws_lb_listener_rule" "green_rule" {
-  listener_arn = aws_lb_listener.https.arn
-  priority     = 100
+# 4.6. ALB Listener: HTTPS(8080) → 테스트용 (Green 헬스체크 전용)
+resource "aws_lb_listener" "test_https" {
+  load_balancer_arn = aws_lb.this.arn
+  port              = 8080
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = var.acm_certificate_arn
 
-  action {
+  default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.green.arn
-  }
-
-  condition {
-    path_pattern {
-      values = ["/green-health-check"]
-    }
   }
 }

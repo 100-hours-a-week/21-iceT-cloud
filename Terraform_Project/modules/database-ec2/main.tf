@@ -76,8 +76,13 @@ resource "aws_instance" "mysql_server" {
     sudo mkdir -p \$TMP_DIR
     cd \$TMP_DIR
 
-    # 최신 백업 파일명 추출
-    LATEST_BACKUP=\$(sudo aws s3 ls s3://koco-db-backup/ | grep 'koco_20' | awk '{print \$4}' | sort | tail -n 1)
+    # 최신 백업 파일명을 AWS CLI 파이프라인으로 추출하여 변수에 할당
+    LATEST_BACKUP=$(sudo aws s3 ls s3://koco-db-backup/ --recursive \
+      | awk '{ print $1" "$2" "$4 }' \
+      | grep '\.sql$' \
+      | sort -k1,2 \
+      | tail -n1 \
+      | awk '{ print $3 }')
 
     # 파일 다운로드
     sudo aws s3 cp s3://koco-db-backup/\$LATEST_BACKUP .

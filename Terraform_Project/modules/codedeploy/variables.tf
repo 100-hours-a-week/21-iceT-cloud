@@ -18,16 +18,21 @@ variable "autoscaling_groups" {
   type        = list(string)
 }
 
-variable "alb_listener_arn" {
+variable "alb_listener_https_arn" {
   description = "alb_listener_arn"
   type        = string
 }
 
-variable "deployment_config_name" {
-  description = "배포 구성 이름 (예: CodeDeployDefault.OneAtATime)"
+variable "alb_listener_test_https_arn" {
+  description = "alb_listener_arn"
   type        = string
-  default     = "CodeDeployDefault.OneAtATime"
 }
+
+# variable "deployment_config_name" {
+#   description = "배포 구성 이름 (예: CodeDeployDefault.OneAtATime)"
+#   type        = string
+#   default     = "CodeDeployDefault.OneAtATime"
+# }
 
 variable "auto_rollback_enabled" {
   description = "자동 롤백 활성화 여부"

@@ -4,15 +4,18 @@ resource "aws_autoscaling_group" "this" {
   max_size            = var.max_size
   min_size            = var.min_size
   vpc_zone_identifier = var.vpc_zone_identifier     #  인스턴스가 자동 분산 배치됨
+  health_check_type         = var.health_check_type
+  health_check_grace_period = 300
 
   launch_template {
     id      = var.launch_template_id
     version = var.launch_template_version
   }
 
-
-  health_check_type         = var.health_check_type
-  health_check_grace_period = var.health_check_grace_period
+   # Blue Target Group에 등록
+  target_group_arns = [
+    var.lb_target_group_blue_arn
+  ]
 
 
 
