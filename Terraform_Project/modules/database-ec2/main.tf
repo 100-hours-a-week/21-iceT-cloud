@@ -14,17 +14,26 @@ resource "aws_iam_role" "ec2_s3_access" {
 }
 
 resource "aws_iam_role_policy" "s3_access_policy" {
-  name   = "S3ReadAccess"
-  role   = aws_iam_role.ec2_s3_access.name
+  name = "S3ReadAccess"
+  role = aws_iam_role.ec2_s3_access.name
+
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Effect   = "Allow",
-      Action   = ["s3:GetObject"],
-      Resource = "arn:aws:s3:::koco-db-backup/*"
-    }]
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["s3:ListBucket"]
+        Resource = "arn:aws:s3:::koco-db-backup"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["s3:GetObject"]
+        Resource = "arn:aws:s3:::koco-db-backup/*"
+      }
+    ]
   })
 }
+
 
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2-s3-access-profile"
@@ -58,8 +67,12 @@ resource "aws_instance" "mysql_server" {
     sudo apt update
     sudo apt install -y openjdk-21-jdk mysql-server awscli
 
+    # MySQL 설정 파일 수정: 모든 인터페이스에서 접속 허용
+    sudo sed -i 's/^bind-address\s*=.*$/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+    sudo sed -i 's/^mysqlx-bind-address\s*=.*$/mysqlx-bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+
     # MySQL 서비스 시작 및 자동 시작 등록
-    sudo systemctl start mysql
+    sudo systemctl restart mysql
     sudo systemctl enable mysql
 
     # MySQL 기본 사용자 및 DB 설정
@@ -73,8 +86,8 @@ resource "aws_instance" "mysql_server" {
 
     # S3에서 최신 백업 SQL 파일 다운로드 및 복원
     TMP_DIR="/tmp/koco-db"
-    sudo mkdir -p \$TMP_DIR
-    cd \$TMP_DIR
+    sudo mkdir -p $TMP_DIR
+    cd $TMP_DIR
 
     # 최신 백업 파일명을 AWS CLI 파이프라인으로 추출하여 변수에 할당
     LATEST_BACKUP=$(sudo aws s3 ls s3://koco-db-backup/ --recursive \
@@ -85,10 +98,10 @@ resource "aws_instance" "mysql_server" {
       | awk '{ print $3 }')
 
     # 파일 다운로드
-    sudo aws s3 cp s3://koco-db-backup/\$LATEST_BACKUP .
+    sudo aws s3 cp "s3://koco-db-backup/$LATEST_BACKUP" .
 
     # DB 복원
-    sudo mysql -u root -pkoco koco < \$LATEST_BACKUP
+    sudo mysql -u root -pkoco koco < $LATEST_BACKUP
   EOF
   )
 

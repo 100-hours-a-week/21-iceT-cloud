@@ -39,10 +39,6 @@ variable "max_size" {
   type        = number
 }
 
-variable "lb_target_group_blue_arn" {
-  type = string
-  description = "List of target group ARNs for the Auto Scaling Group"
-}
 
 variable "health_check_type" {
   description = "헬스체크 타입 (예: EC2, ELB)"
@@ -57,6 +53,12 @@ variable "health_check_grace_period" {
 }
 
 variable "instance_tag_name" {
+  description = "ASG 인스턴스에 부여할 Name 태그 값"
+  type        = string
+  default     = "app-instance"
+}
+
+variable "alb_target_group_bluegreen_arn" {
   description = "ASG 인스턴스에 부여할 Name 태그 값"
   type        = string
   default     = "app-instance"

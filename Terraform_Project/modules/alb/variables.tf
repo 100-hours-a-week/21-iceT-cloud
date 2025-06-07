@@ -6,6 +6,7 @@ variable "domain_name" {
 variable "environment" {
   description = "환경 이름 (예: dev, stage, prod)"
   type        = string
+  default = "dev"
 }
 
 variable "alb_name" {
@@ -80,4 +81,9 @@ variable "listener_protocol" {
 variable "acm_certificate_arn" {
   type = string
   default = "arn:aws:acm:ap-northeast-2:266735804784:certificate/c29976ee-8091-402e-b321-486a0884b60a"
+}
+
+variable "alb_logs_bucket_name" {
+  type = string
+  default = "koco-alb-logs"
 }

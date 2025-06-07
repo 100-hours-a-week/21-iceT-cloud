@@ -16,7 +16,10 @@ resource "aws_cloudfront_distribution" "cdn" {
   comment             = "Frontend SPA with ALB API routing"
   default_root_object = var.default_root_object
 
-  aliases = [var.domain_name, "www.${var.domain_name}"]
+  aliases = [
+    var.domain_name, 
+    "www.${var.domain_name}"
+  ]
 
   # S3 정적 호스팅
   origin {
@@ -30,15 +33,38 @@ resource "aws_cloudfront_distribution" "cdn" {
 
   # SpringBoot
   origin {
-    domain_name = var.alb_dns_name
+    domain_name = var.alb_dns_name #alb dns 이름이 아니라 api.koco.click 또는 api.ktbkoco.com 으로 설정해야 함
     origin_id   = "ALB-Spring"
 
     custom_origin_config {
-      http_port              = 8080
+      http_port              = 80
       https_port             = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
     }
+  }
+
+  # OAuth 요청 (ALB로 라우팅)
+  ordered_cache_behavior {
+    path_pattern     = "/oauth/*"
+    target_origin_id = "ALB-Spring"
+
+    allowed_methods       = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods        = ["GET", "HEAD"]
+    viewer_protocol_policy = "redirect-to-https"
+
+    forwarded_values {
+      query_string = true
+      headers      = ["Authorization"]
+
+      cookies {
+        forward = "all"
+      }
+    }
+
+    min_ttl     = 0
+    default_ttl = 0
+    max_ttl     = 0
   }
 
   # SpringBoot 요청

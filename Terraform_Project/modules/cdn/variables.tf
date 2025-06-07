@@ -12,6 +12,7 @@ variable "default_root_object" {
 variable "alb_dns_name" {
   type        = string
   description = "ALB DNS name for /api traffic"
+  default = "api.koco.click"
 }
 
 variable "domain_name" {
