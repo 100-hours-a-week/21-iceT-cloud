@@ -27,7 +27,6 @@ module "s3_static_site" {
 module "cdn" {
   source         = "../../modules/cdn"
   s3_bucket_name = module.s3_static_site.s3_bucket_name
-  alb_dns_name = module.alb.alb_dns_name
 }
 
 
@@ -60,10 +59,7 @@ module "codedeploy" {
   app_name              = "was-deploy-app"
   deployment_group_name = "was-deploy-group"
   service_role_arn      = module.iam.codedeploy_role_arn
-  target_group_blue_name = module.alb.target_group_blue_name
-  target_group_green_name = module.alb.target_group_green_name
   alb_listener_https_arn = module.alb.alb_listener_https_arn
-  alb_listener_test_https_arn = module.alb.alb_listener_test_https_arn
   autoscaling_groups    = [module.asg.asg_name]
 
   depends_on = [
@@ -95,7 +91,7 @@ module "asg" {
   desired_capacity      = 1
   min_size              = 1
   max_size              = 1
-  lb_target_group_blue_arn = module.alb.target_group_blue_arn
+  alb_target_group_bluegreen_arn = module.alb.target_group_BlueGreen_arn
 
   health_check_type         = "EC2"
   health_check_grace_period = 300

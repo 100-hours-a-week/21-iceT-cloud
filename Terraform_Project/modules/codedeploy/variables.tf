@@ -23,10 +23,7 @@ variable "alb_listener_https_arn" {
   type        = string
 }
 
-variable "alb_listener_test_https_arn" {
-  description = "alb_listener_arn"
-  type        = string
-}
+
 
 # variable "deployment_config_name" {
 #   description = "배포 구성 이름 (예: CodeDeployDefault.OneAtATime)"
@@ -46,13 +43,4 @@ variable "auto_rollback_events" {
   default     = ["DEPLOYMENT_FAILURE"]
 }
 
-variable "target_group_blue_name" {
-  description = "blue 대상 그룹 이름"
-  type = string
-}
 
-
-variable "target_group_green_name" {
-  description = "green 대상 그룹 이름"
-  type = string
-}

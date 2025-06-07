@@ -34,15 +34,13 @@ variable "user_data" {
     sudo apt-get upgrade -y
 
     #-------------------------------
-    # CodeDeploy 에이전트 설치
+    # AWS CLI v2 설치
     #-------------------------------
-    sudo apt-get install -y ruby wget
-    cd /home/ubuntu
-    sudo wget https://aws-codedeploy-ap-northeast-2.s3.amazonaws.com/latest/install
-    sudo chmod +x ./install
-    sudo ./install auto
-    sudo systemctl start codedeploy-agent
-    sudo systemctl enable codedeploy-agent
+    sudo apt-get install -y unzip curl
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
+    unzip /tmp/awscliv2.zip -d /tmp
+    sudo /tmp/aws/install
+    rm -rf /tmp/aws /tmp/awscliv2.zip
 
     #-------------------------------
     # Docker 설치 및 설정
@@ -75,14 +73,17 @@ variable "user_data" {
       -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
 
+
     #-------------------------------
-    # AWS CLI v2 설치
+    # CodeDeploy 에이전트 설치
     #-------------------------------
-    sudo apt-get install -y unzip curl
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "/tmp/awscliv2.zip"
-    unzip /tmp/awscliv2.zip -d /tmp
-    sudo /tmp/aws/install
-    rm -rf /tmp/aws /tmp/awscliv2.zip
-    
+    sudo apt-get install -y ruby wget
+    cd /home/ubuntu
+    sudo wget https://aws-codedeploy-ap-northeast-2.s3.amazonaws.com/latest/install
+    sudo chmod +x ./install
+    sudo ./install auto
+    sudo systemctl start codedeploy-agent
+    sudo systemctl enable codedeploy-agent
+
   EOF
 }

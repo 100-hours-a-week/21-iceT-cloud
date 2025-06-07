@@ -83,6 +83,14 @@ resource "aws_security_group" "monitoring_sg" {
     cidr_blocks =  ["0.0.0.0/0"]  # 내부 VPC 통신용
   }
 
+  ingress {
+    description = "Allow SSH (port 22) from OpenVPN clients"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks =  ["0.0.0.0/0"]  # 또는 ["0.0.0.0/0"] 테스트용, 보안 시 YOUR_IP로 제한
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -99,6 +107,7 @@ resource "aws_security_group" "monitoring_sg" {
 resource "aws_instance" "ec2-monitoring-server" {
   ami                    = "ami-05a7f3469a7653972"
   instance_type          = "t3.micro"
+  private_ip             = "10.1.3.100" # 고정 프라이빗 IP 지정
   subnet_id              = var.private_subnet_id
   vpc_security_group_ids = [aws_security_group.monitoring_sg.id]
 

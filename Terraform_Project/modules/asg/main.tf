@@ -12,11 +12,8 @@ resource "aws_autoscaling_group" "this" {
     version = var.launch_template_version
   }
 
-   # Blue Target Group에 등록
-  target_group_arns = [
-    var.lb_target_group_blue_arn
-  ]
-
+  # ALB Target Group 연결: tg-BlueGreen
+  target_group_arns = [var.alb_target_group_bluegreen_arn]   # 아래에서 정의된 hw-tg-bluegreen 과 연결
 
 
   tag {
