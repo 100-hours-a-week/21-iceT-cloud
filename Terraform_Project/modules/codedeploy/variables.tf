@@ -31,6 +31,13 @@ variable "alb_listener_https_arn" {
 #   default     = "CodeDeployDefault.OneAtATime"
 # }
 
+
+# variable "deployment_config_name" {
+#   description = "배포 구성 이름 (예: CodeDeployDefault.OneAtATime)"
+#   type        = string
+#   default     = "CodeDeployDefault.OneAtATime"
+# }
+
 variable "auto_rollback_enabled" {
   description = "자동 롤백 활성화 여부"
   type        = bool

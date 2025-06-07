@@ -91,7 +91,9 @@ module "asg" {
   desired_capacity      = 1
   min_size              = 1
   max_size              = 1
+
   alb_target_group_bluegreen_arn = module.alb.target_group_BlueGreen_arn
+
 
   health_check_type         = "EC2"
   health_check_grace_period = 300

@@ -73,7 +73,6 @@ variable "user_data" {
       -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
 
-
     #-------------------------------
     # CodeDeploy 에이전트 설치
     #-------------------------------

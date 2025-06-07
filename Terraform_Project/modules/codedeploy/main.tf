@@ -43,6 +43,7 @@ resource "aws_codedeploy_deployment_group" "was_dg" {
       name = "tg-BlueGreen"
     }
 
+
     # 💡 핵심: CodeDeploy가 이 블록을 통해 대상 그룹과의 연결을 확실히 인식
     target_group_pair_info {
       target_group {

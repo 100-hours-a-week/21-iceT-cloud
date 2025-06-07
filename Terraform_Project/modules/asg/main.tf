@@ -16,6 +16,7 @@ resource "aws_autoscaling_group" "this" {
   target_group_arns = [var.alb_target_group_bluegreen_arn]   # 아래에서 정의된 hw-tg-bluegreen 과 연결
 
 
+
   tag {
     key                 = "Name"
     value               = var.instance_tag_name
